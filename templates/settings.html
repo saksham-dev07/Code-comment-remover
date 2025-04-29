@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block title %}Settings - Comment Remover{% endblock %}
+{% block content %}
+<div class="container-fluid py-5">
+  <div class="card-header bg-primary text-white">
+    <h5 class="mb-0"><i class="bi bi-gear-fill me-2"></i> Removal Rules & Preferences</h5>
+  </div>
+  <div class="card-body" style="background-color: #1e293b;">
+    <ul class="nav nav-tabs nav-justified mb-4" id="langTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="python-tab" data-bs-toggle="tab" data-bs-target="#python-settings" type="button" role="tab">
+          <i class="bi bi-python"></i> Python
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="js-tab" data-bs-toggle="tab" data-bs-target="#js-settings" type="button" role="tab">
+          <i class="bi bi-code-slash"></i> JS/CSS
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="html-tab" data-bs-toggle="tab" data-bs-target="#html-settings" type="button" role="tab">
+          <i class="bi bi-file-code-fill"></i> HTML
+        </button>
+      </li>
+    </ul>
+
+    <form id="settings-form" data-settings='{{ settings|tojson|safe }}'>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="python-settings" role="tabpanel">
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="rule-py-line">
+            <label class="form-check-label fw-medium" for="rule-py-line">Remove <code># ...</code> comments</label>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="rule-py-doc">
+            <label class="form-check-label fw-medium" for="rule-py-doc">Preserve docstrings</label>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="js-settings" role="tabpanel">
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="rule-js-block">
+            <label class="form-check-label fw-medium" for="rule-js-block">Remove <code>/* ... */</code> comments</label>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="rule-js-line">
+            <label class="form-check-label fw-medium" for="rule-js-line">Remove <code>// ...</code> comments</label>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="html-settings" role="tabpanel">
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="rule-html-comment">
+            <label class="form-check-label fw-medium" for="rule-html-comment">Remove <code>&lt;!-- ... --&gt;</code> comments</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 gap-2">
+        <button type="button" id="reset-btn" class="btn btn-outline-warning btn-sm">
+          <i class="bi bi-arrow-counterclockwise me-1"></i> Reset to Defaults
+        </button>
+
+        <div class="btn-group btn-group-sm" role="group">
+          <label class="btn btn-outline-secondary mb-0">
+            <i class="bi bi-upload me-1"></i> Import
+            <input type="file" id="import-json" accept="application/json" hidden>
+          </label>
+          <button type="button" id="export-btn" class="btn btn-outline-info">
+            <i class="bi bi-download me-1"></i> Export
+          </button>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-sm">
+          <i class="bi bi-save me-1"></i> Save Settings
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const DEFAULTS = {
+    py_line: true,
+    py_doc: false,
+    js_block: true,
+    js_line: true,
+    html_comment: true
+  };
+
+  function applySettings(settings) {
+    document.getElementById('rule-py-line').checked      = settings.py_line;
+    document.getElementById('rule-py-doc').checked       = settings.py_doc;
+    document.getElementById('rule-js-block').checked     = settings.js_block;
+    document.getElementById('rule-js-line').checked      = settings.js_line;
+    document.getElementById('rule-html-comment').checked = settings.html_comment;
+  }
+
+  function readSettings() {
+    return {
+      py_line:      document.getElementById('rule-py-line').checked,
+      py_doc:       document.getElementById('rule-py-doc').checked,
+      js_block:     document.getElementById('rule-js-block').checked,
+      js_line:      document.getElementById('rule-js-line').checked,
+      html_comment: document.getElementById('rule-html-comment').checked
+    };
+  }
+
+  // Read JSON from data attribute
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('settings-form');
+    const serverSettings = JSON.parse(form.dataset.settings);
+    applySettings(serverSettings);
+  });
+
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    if (confirm('Reset all settings to defaults?')) applySettings(DEFAULTS);
+  });
+
+  document.getElementById('export-btn').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(readSettings(), null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'comment_remover_settings.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('import-json').addEventListener('change', e => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const obj = JSON.parse(reader.result);
+        applySettings({ ...DEFAULTS, ...obj });
+      } catch (err) {
+        alert('Invalid JSON file.');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  document.getElementById('settings-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const payload = readSettings();
+    const resp = await fetch('/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await resp.json();
+    if (json.success) alert('Settings saved on server!');
+  });
+</script>
+{% endblock %}

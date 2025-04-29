@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}Home - Comment Remover{% endblock %}
+{% block content %}
+<section class="text-center mb-4">
+  <h1 class="display-6">Upload & Clean Your Code</h1>
+  <p class="text-secondary">Drag & drop multiple files or click to select. Supported: .py, .js, .css, .html</p>
+</section>
+
+<!-- Controls: Settings & Clear -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    
+    <button id="clear-btn" class="btn btn-outline-danger ms-2">
+      <i class="bi bi-x-circle"></i> Clear All
+    </button>
+  </div>
+</div>
+
+
+
+<!-- File Upload Area -->
+<div class="mb-4">
+  <div id="drop-zone" class="border border-dashed p-5 text-center rounded text-secondary">
+    <i class="bi bi-cloud-upload-fill fs-1 mb-3"></i>
+    <p class="mb-0">Drag & Drop files <strong>or</strong> click to upload</p>
+    <input type="file" id="file-input" multiple accept=".py,.js,.css,.html,.htm" class="d-none">
+  </div>
+</div>
+
+<!-- Process & Progress -->
+<div class="d-flex align-items-center gap-3 mb-4">
+  <button id="process-btn" class="btn btn-primary" disabled>
+    <i class="bi bi-arrow-repeat me-1"></i> Process Files
+  </button>
+  <div id="progress-container" class="flex-fill d-none">
+    <div class="progress" style="height:1rem">
+      <div id="progress-bar" class="progress-bar" role="progressbar" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Summary Table -->
+<div id="stats-container" class="mb-4 d-none">
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>File</th>
+        <th>Original</th>
+        <th>Cleaned</th>
+        <th>Removed</th>
+      </tr>
+    </thead>
+    <tbody id="stats-body"></tbody>
+  </table>
+</div>
+
+<!-- Preview & Download -->
+<div id="preview-container" class="row gy-4"></div>
+<div class="text-end">
+  <button id="download-zip" class="btn btn-success d-none">
+    <i class="bi bi-download me-1"></i> Download ZIP
+  </button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script>
+  // Clear all uploaded files by reloading
+  document.getElementById('clear-btn').addEventListener('click', () => window.location.reload());
+
+  // Override process button to include inline settings
+  document.getElementById('process-btn').addEventListener('click', () => {
+    const files = window.uploadedFiles || [];
+    const rules = {
+      block: document.getElementById('inline-rule-block').checked,
+      line: document.getElementById('inline-rule-line').checked,
+      preserve_doc: document.getElementById('inline-rule-doc').checked
+    };
+    window.startProcessing(files, rules, updateStats);
+  });
+
+  // Populate stats table after processing
+  function updateStats(stats) {
+    const body = document.getElementById('stats-body');
+    body.innerHTML = '';
+    stats.forEach(s => {
+      const row = document.createElement('tr');
+      ['name','original_lines','cleaned_lines','removed'].forEach(key => {
+        const td = document.createElement('td');
+        td.textContent = s[key];
+        row.appendChild(td);
+      });
+      body.appendChild(row);
+    });
+    document.getElementById('stats-container').classList.remove('d-none');
+  }
+</script>
+{% endblock %}
