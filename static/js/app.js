@@ -61,6 +61,10 @@ processBtn.addEventListener('click', async () => {
   const data = await res.json();
   processed = data.files;
 
+  if (window.updateStats && data.stats) {
+    window.updateStats(data.stats);
+  }
+
   showPreview(payload);
   downloadZipBtn.classList.remove('d-none');
 });
@@ -75,10 +79,10 @@ function showPreview(origList) {
     const ocol = document.createElement('div');
     ocol.className = 'col-md-6';
     const ocard = document.createElement('div');
-    ocard.className = 'card';
+    ocard.className = 'card h-100';
     ocard.innerHTML = `
-      <div class="card-header bg-light"><strong>Original: ${f.name}</strong></div>
-      <pre class="language-${f.name.split('.').pop()}">${escapeHtml(f.content)}</pre>
+      <div class="card-header"><strong>Original: ${f.name}</strong></div>
+      <pre class="language-${f.name.split('.').pop()} h-100">${escapeHtml(f.content)}</pre>
     `;
     ocol.appendChild(ocard);
 
@@ -86,10 +90,10 @@ function showPreview(origList) {
     const ccol = document.createElement('div');
     ccol.className = 'col-md-6';
     const ccard = document.createElement('div');
-    ccard.className = 'card';
+    ccard.className = 'card h-100';
     ccard.innerHTML = `
-      <div class="card-header bg-light"><strong>Processed: ${f.name}</strong></div>
-      <pre class="language-${f.name.split('.').pop()}">${escapeHtml(clean)}</pre>
+      <div class="card-header"><strong>Processed: ${f.name}</strong></div>
+      <pre class="language-${f.name.split('.').pop()} h-100">${escapeHtml(clean)}</pre>
     `;
     ccol.appendChild(ccard);
 

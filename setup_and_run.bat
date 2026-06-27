@@ -11,7 +11,7 @@ REM ============================================================
 REM Print header
 REM ============================================================
 echo ===============================================================
-echo                 FLASK APP SETUP & RUN UTILITY                 
+echo                 FLASK APP SETUP ^& RUN UTILITY                 
 echo ===============================================================
 echo.
 
@@ -31,6 +31,14 @@ echo ---------------------------------------------------------------
 REM ============================================================
 REM 2. Set up the Python virtual environment
 REM ============================================================
+if exist "venv" (
+    venv\Scripts\python.exe -c "pass" >nul 2>&1
+    if errorlevel 1 (
+        echo [INFO] Virtual environment appears to be broken. Removing it...
+        rmdir /s /q venv
+    )
+)
+
 if not exist "venv" (
     echo [INFO] Creating virtual environment...
     python -m venv venv
@@ -41,7 +49,7 @@ if not exist "venv" (
     )
     echo [SUCCESS] Virtual environment created.
 ) else (
-    echo [INFO] Virtual environment already exists.
+    echo [INFO] Virtual environment already exists and is healthy.
 )
 echo ---------------------------------------------------------------
 

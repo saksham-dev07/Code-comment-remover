@@ -33,7 +33,7 @@
     <i class="bi bi-arrow-repeat me-1"></i> Process Files
   </button>
   <div id="progress-container" class="flex-fill d-none">
-    <div class="progress" style="height:1rem">
+    <div class="progress">
       <div id="progress-bar" class="progress-bar" role="progressbar" style="width:0%"></div>
     </div>
   </div>
@@ -69,19 +69,8 @@
   // Clear all uploaded files by reloading
   document.getElementById('clear-btn').addEventListener('click', () => window.location.reload());
 
-  // Override process button to include inline settings
-  document.getElementById('process-btn').addEventListener('click', () => {
-    const files = window.uploadedFiles || [];
-    const rules = {
-      block: document.getElementById('inline-rule-block').checked,
-      line: document.getElementById('inline-rule-line').checked,
-      preserve_doc: document.getElementById('inline-rule-doc').checked
-    };
-    window.startProcessing(files, rules, updateStats);
-  });
-
   // Populate stats table after processing
-  function updateStats(stats) {
+  window.updateStats = function(stats) {
     const body = document.getElementById('stats-body');
     body.innerHTML = '';
     stats.forEach(s => {
@@ -94,6 +83,6 @@
       body.appendChild(row);
     });
     document.getElementById('stats-container').classList.remove('d-none');
-  }
+  };
 </script>
 {% endblock %}

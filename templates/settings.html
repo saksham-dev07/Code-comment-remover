@@ -1,81 +1,83 @@
 {% extends 'base.html' %}
 {% block title %}Settings - Comment Remover{% endblock %}
 {% block content %}
-<div class="container-fluid py-5">
-  <div class="card-header bg-primary text-white">
-    <h5 class="mb-0"><i class="bi bi-gear-fill me-2"></i> Removal Rules & Preferences</h5>
-  </div>
-  <div class="card-body" style="background-color: #1e293b;">
-    <ul class="nav nav-tabs nav-justified mb-4" id="langTabs" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="python-tab" data-bs-toggle="tab" data-bs-target="#python-settings" type="button" role="tab">
-          <i class="bi bi-python"></i> Python
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="js-tab" data-bs-toggle="tab" data-bs-target="#js-settings" type="button" role="tab">
-          <i class="bi bi-code-slash"></i> JS/CSS
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="html-tab" data-bs-toggle="tab" data-bs-target="#html-settings" type="button" role="tab">
-          <i class="bi bi-file-code-fill"></i> HTML
-        </button>
-      </li>
-    </ul>
+<div class="container py-5">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0"><i class="bi bi-gear-fill me-2"></i> Removal Rules & Preferences</h5>
+    </div>
+    <div class="card-body p-4">
+      <ul class="nav nav-tabs nav-justified mb-4" id="langTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="python-tab" data-bs-toggle="tab" data-bs-target="#python-settings" type="button" role="tab">
+            <i class="bi bi-python"></i> Python
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="js-tab" data-bs-toggle="tab" data-bs-target="#js-settings" type="button" role="tab">
+            <i class="bi bi-code-slash"></i> JS/CSS
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="html-tab" data-bs-toggle="tab" data-bs-target="#html-settings" type="button" role="tab">
+            <i class="bi bi-file-code-fill"></i> HTML
+          </button>
+        </li>
+      </ul>
 
-    <form id="settings-form" data-settings='{{ settings|tojson|safe }}'>
-      <div class="tab-content">
-        <div class="tab-pane fade show active" id="python-settings" role="tabpanel">
-          <div class="form-check form-switch mb-3">
-            <input class="form-check-input" type="checkbox" id="rule-py-line">
-            <label class="form-check-label fw-medium" for="rule-py-line">Remove <code># ...</code> comments</label>
+      <form id="settings-form" data-settings='{{ settings|tojson|safe }}'>
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="python-settings" role="tabpanel">
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="rule-py-line">
+              <label class="form-check-label fw-medium" for="rule-py-line">Remove <code># ...</code> comments</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="rule-py-doc">
+              <label class="form-check-label fw-medium" for="rule-py-doc">Preserve docstrings</label>
+            </div>
           </div>
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="rule-py-doc">
-            <label class="form-check-label fw-medium" for="rule-py-doc">Preserve docstrings</label>
+
+          <div class="tab-pane fade" id="js-settings" role="tabpanel">
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="rule-js-block">
+              <label class="form-check-label fw-medium" for="rule-js-block">Remove <code>/* ... */</code> comments</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="rule-js-line">
+              <label class="form-check-label fw-medium" for="rule-js-line">Remove <code>// ...</code> comments</label>
+            </div>
+          </div>
+
+          <div class="tab-pane fade" id="html-settings" role="tabpanel">
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="rule-html-comment">
+              <label class="form-check-label fw-medium" for="rule-html-comment">Remove <code>&lt;!-- ... --&gt;</code> comments</label>
+            </div>
           </div>
         </div>
 
-        <div class="tab-pane fade" id="js-settings" role="tabpanel">
-          <div class="form-check form-switch mb-3">
-            <input class="form-check-input" type="checkbox" id="rule-js-block">
-            <label class="form-check-label fw-medium" for="rule-js-block">Remove <code>/* ... */</code> comments</label>
-          </div>
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="rule-js-line">
-            <label class="form-check-label fw-medium" for="rule-js-line">Remove <code>// ...</code> comments</label>
-          </div>
-        </div>
+        <div class="d-flex flex-wrap justify-content-between align-items-center mt-5 gap-2 pt-3 border-top border-secondary" style="border-color: var(--surface-border) !important;">
+          <button type="button" id="reset-btn" class="btn btn-outline-danger btn-sm">
+            <i class="bi bi-arrow-counterclockwise me-1"></i> Reset to Defaults
+          </button>
 
-        <div class="tab-pane fade" id="html-settings" role="tabpanel">
-          <div class="form-check form-switch mb-3">
-            <input class="form-check-input" type="checkbox" id="rule-html-comment">
-            <label class="form-check-label fw-medium" for="rule-html-comment">Remove <code>&lt;!-- ... --&gt;</code> comments</label>
+          <div class="btn-group btn-group-sm" role="group">
+            <label class="btn btn-outline-secondary mb-0">
+              <i class="bi bi-upload me-1"></i> Import
+              <input type="file" id="import-json" accept="application/json" hidden>
+            </label>
+            <button type="button" id="export-btn" class="btn btn-outline-secondary">
+              <i class="bi bi-download me-1"></i> Export
+            </button>
           </div>
-        </div>
-      </div>
 
-      <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 gap-2">
-        <button type="button" id="reset-btn" class="btn btn-outline-warning btn-sm">
-          <i class="bi bi-arrow-counterclockwise me-1"></i> Reset to Defaults
-        </button>
-
-        <div class="btn-group btn-group-sm" role="group">
-          <label class="btn btn-outline-secondary mb-0">
-            <i class="bi bi-upload me-1"></i> Import
-            <input type="file" id="import-json" accept="application/json" hidden>
-          </label>
-          <button type="button" id="export-btn" class="btn btn-outline-info">
-            <i class="bi bi-download me-1"></i> Export
+          <button type="submit" class="btn btn-primary btn-sm">
+            <i class="bi bi-save me-1"></i> Save Settings
           </button>
         </div>
-
-        <button type="submit" class="btn btn-primary btn-sm">
-          <i class="bi bi-save me-1"></i> Save Settings
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 </div>
 {% endblock %}
